@@ -18,20 +18,23 @@ msg_cpu_turno:        .asciiz "\n--- Turno de la CPU ---\n"
 msg_cpu_construir:    .asciiz "La CPU ha aumentado su ataque.\n"
 msg_cpu_atacar:       .asciiz "La CPU ha atacado al jugador.\n"
 msg_cpu_pasar:        .asciiz "La CPU ha pasado su turno y ganado recursos.\n"
+msg_estado_combate: .asciiz "=== ESTADO DEL COMBATE ===\n"
+msg_hp_enemigo: .asciiz "HP Enemigo: "
+msg_enemigo_aparece: .asciiz "¡Un enemigo salvaje aparece!\n"
 
 # Mensajes para eventos del mapa
-msg_recurso_obtenido: .asciiz "Â¡Has encontrado un recurso! Has ganado 3 recursos.\n"
-msg_arma_obtenida:    .asciiz "Â¡Has obtenido un arma! Tu ataque ha aumentado.\n"
+msg_recurso_obtenido: .asciiz "¡Has encontrado un recurso! Has ganado 3 recursos.\n"
+msg_arma_obtenida:    .asciiz "¡Has obtenido un arma! Tu ataque ha aumentado.\n"
 msg_jefe_turno:       .asciiz "\n--- El Jefe está atacando ---\n"
 msg_jefe_derrotado:    .asciiz "\n¡Has derrotado al Jefe! Â¡Eterra estÃ¡ salvado!\n"
 msg_jefe_derrota:      .asciiz "\nEl Jefe te ha derrotado. Â¡El balance de Eterra se ha perdido!\n"
 
 # Mensajes del jugador
-msg_jugador_gana:     .asciiz "\nÂ¡Ganaste! Has derrotado a todos los enemigos.\n"
+msg_jugador_gana:     .asciiz "\n¡Ganaste! Has derrotado a todos los enemigos.\n"
 msg_cpu_gana:         .asciiz "\nPerdiste. La CPU te derrotó³.\n"
-msg_exploracion:      .asciiz "\nContinÃºas explorando...\n"
+msg_exploracion:      .asciiz "\nContinúas explorando...\n"
 intro_msg:            .asciiz "\nEn un mundo destruido por el abuso de los cristales del clima,\nKael, el último guardian, se enfrenta a la corrupcion final.\nSu espiritu puro es su unica arma...\n¡Protege Eterra o cae con ella!\n"
-msg_turno_jugador:    .asciiz "Â¡Es tu turno! Elige una acciÃ³n.\n"
+msg_turno_jugador:    .asciiz "¡Es tu turno! Elige una acción.\n"
 
 # Mensajes de exploración y mapa
 msg_mapa: .asciiz "Mapa del juego: \n[Jugador en Fila: 0, Columna: 0]\n"
@@ -46,3 +49,7 @@ msg_estado_jugador: .asciiz "Estado actual del jugador:\n"
 msg_hp_jugador: .asciiz "HP: "
 msg_recursos_jugador: .asciiz "Recursos: "
 msg_ataque_jugador: .asciiz "Ataque: "
+
+#Lineas separadoras
+separador_largo: .asciiz "\n========================\n"
+separador_corto: .asciiz "\n---------------\n"

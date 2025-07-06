@@ -361,6 +361,9 @@ combate_enemigo:
     addi $sp, $sp, -4
     sw $ra, 0($sp)
     
+    # Mostrar estado inicial del enemigo
+    jal mostrar_estado_enemigo
+    
 bucle_combate:
     # Verificar si el enemigo está muerto
     blez $s3, fin_combate_jugador_gana
@@ -374,11 +377,17 @@ bucle_combate:
     # Verificar si el enemigo murió después del ataque del jugador
     blez $s3, fin_combate_jugador_gana
     
+    # Mostrar estado después del turno del jugador
+    jal mostrar_estado_combate
+    
     # Turno del enemigo
     jal turno_cpu_combate
     
-    j bucle_combate
+    # Mostrar estado después del turno del enemigo
+    jal mostrar_estado_combate
     
+    j bucle_combate
+
 fin_combate_jugador_gana:
     li $v0, 4
     la $a0, msg_atacar_ok
@@ -493,6 +502,10 @@ fin_turno_jugador:
 
 # Turno de la CPU en combate
 turno_cpu_combate:
+    # Guardar $ra
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
     jal imprimir_linea_separadora
     
     li $v0, 4
@@ -522,9 +535,14 @@ cpu_atacar:
     li $v0, 4
     la $a0, msg_newline
     syscall
-    jr $ra
+    j fin_turno_cpu
 
 cpu_construir:
+    # Verificar si la CPU tiene recursos suficientes
+    li $t0, 2
+    blt $s4, $t0, cpu_sin_recursos
+    
+    sub $s4, $s4, 2  # Cuesta 2 recursos
     addi $s5, $s5, 1
     li $v0, 4
     la $a0, msg_cpu_construir
@@ -532,7 +550,18 @@ cpu_construir:
     li $v0, 4
     la $a0, msg_newline
     syscall
-    jr $ra
+    j fin_turno_cpu
+
+cpu_sin_recursos:
+    # Si no tiene recursos, pasar turno
+    addi $s4, $s4, 1
+    li $v0, 4
+    la $a0, msg_cpu_pasar
+    syscall
+    li $v0, 4
+    la $a0, msg_newline
+    syscall
+    j fin_turno_cpu
 
 cpu_pasar:
     addi $s4, $s4, 1
@@ -542,6 +571,12 @@ cpu_pasar:
     li $v0, 4
     la $a0, msg_newline
     syscall
+    j fin_turno_cpu
+
+fin_turno_cpu:
+    # Restaurar $ra
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
     jr $ra
 
 # Batalla contra el jefe
@@ -599,11 +634,17 @@ fin_jefe_gana:
 
 # Turno del jefe (más agresivo)
 turno_jefe:
+    # Guardar $ra
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
+    jal imprimir_linea_separadora
+    
     li $v0, 4
     la $a0, msg_jefe_turno
     syscall
     
-    # El jefe siempre ataca
+    # El jefe siempre ataca (más agresivo)
     sub $s0, $s0, $s5
     li $v0, 4
     la $a0, msg_cpu_atacar
@@ -611,6 +652,10 @@ turno_jefe:
     li $v0, 4
     la $a0, msg_newline
     syscall
+    
+    # Restaurar $ra
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
     jr $ra
 
 # Subrutina para mostrar el estado del jugador
@@ -660,7 +705,75 @@ mostrar_estado_jugador:
     lw $ra, 0($sp)
     addi $sp, $sp, 4
     jr $ra
+    
+# Mostrar estado del combate
+mostrar_estado_combate:
+    # Guardar $ra
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
+    li $v0, 4
+    la $a0, msg_newline
+    syscall
+    
+    li $v0, 4
+    la $a0, msg_estado_combate
+    syscall
+    
+    # Mostrar HP del jugador
+    li $v0, 4
+    la $a0, msg_hp_jugador
+    syscall
+    move $a0, $s0
+    li $v0, 1
+    syscall
+    
+    li $v0, 4
+    la $a0, msg_newline
+    syscall
+    
+    # Mostrar HP del enemigo
+    li $v0, 4
+    la $a0, msg_hp_enemigo
+    syscall
+    move $a0, $s3
+    li $v0, 1
+    syscall
+    
+    li $v0, 4
+    la $a0, msg_newline
+    syscall
+    
+    # Restaurar $ra
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
 
+# Mostrar estado inicial del enemigo
+mostrar_estado_enemigo:
+    # Guardar $ra
+    addi $sp, $sp, -4
+    sw $ra, 0($sp)
+    
+    li $v0, 4
+    la $a0, msg_enemigo_aparece
+    syscall
+    
+    li $v0, 4
+    la $a0, msg_hp_enemigo
+    syscall
+    move $a0, $s3
+    li $v0, 1
+    syscall
+    
+    li $v0, 4
+    la $a0, msg_newline
+    syscall
+    
+    # Restaurar $ra
+    lw $ra, 0($sp)
+    addi $sp, $sp, 4
+    jr $ra
 
 # Finales del juego
 fin_jugador_gana:
@@ -684,117 +797,17 @@ fin_cpu_gana:
 # Funciones utilitarias para mejorar la presentación
 imprimir_separador:
     # Imprimir línea de separación larga
-    li $v0, 4
-    la $a0, msg_newline
-    syscall
-    
-    li $v0, 11
-    li $a0, 61  # '='
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    li $v0, 11
-    li $a0, 61
-    syscall
-    
-    li $v0, 4
-    la $a0, msg_newline
+    li $v0, 4                    # syscall para imprimir string
+    la $a0, separador_largo      # cargar dirección del separador largo
     syscall
     jr $ra
 
 imprimir_linea_separadora:
     # Imprimir línea de separación corta
-    li $v0, 4
-    la $a0, msg_newline
+    li $v0, 4                    # syscall para imprimir string
+    la $a0, separador_corto      # cargar dirección del separador corto
     syscall
-    
-    li $v0, 11
-    li $a0, 45  # '-'
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    li $v0, 11
-    li $a0, 45
-    syscall
-    
-    li $v0, 4
-    la $a0, msg_newline
-    syscall
-    jr $ra
+    jr $ra  
 
 salir:
     li $v0, 10
