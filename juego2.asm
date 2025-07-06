@@ -298,10 +298,8 @@ explorar_casilla:
     li $t1, 2
     beq $t0, $t1, evento_enemigo
     
-    # Restaurar $ra
-    lw $ra, 0($sp)
-    addi $sp, $sp, 4
-    jr $ra
+    # Si no se ejecuta ningún evento (no debería pasar)
+    j fin_explorar_casilla
 
 # Eventos del mapa
 evento_recurso:
@@ -314,10 +312,8 @@ evento_recurso:
     
     jal imprimir_linea_separadora
     
-    # Restaurar $ra
-    lw $ra, 0($sp)
-    addi $sp, $sp, 4
-    jr $ra
+    # IMPORTANTE: Saltar al final para restaurar el stack
+    j fin_explorar_casilla
 
 evento_arma:
     jal imprimir_linea_separadora
@@ -329,10 +325,8 @@ evento_arma:
     
     jal imprimir_linea_separadora
     
-    # Restaurar $ra
-    lw $ra, 0($sp)
-    addi $sp, $sp, 4
-    jr $ra
+    # IMPORTANTE: Saltar al final para restaurar el stack
+    j fin_explorar_casilla
 
 evento_enemigo:
     jal imprimir_linea_separadora
@@ -350,6 +344,10 @@ evento_enemigo:
     # Comenzar combate
     jal combate_enemigo
     
+    # IMPORTANTE: Saltar al final para restaurar el stack
+    j fin_explorar_casilla
+    
+fin_explorar_casilla:
     # Restaurar $ra
     lw $ra, 0($sp)
     addi $sp, $sp, 4
